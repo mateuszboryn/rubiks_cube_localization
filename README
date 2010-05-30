@@ -1,7 +1,9 @@
 Rubik's Cube Localization
 
 Locate Rubik's Cube in given image.
-
+Required libraries:
+ - OpenCV 2.1 
+ - Boost 1.40
 
 Projekt na POBR, Mateusz Boryń 2010
 

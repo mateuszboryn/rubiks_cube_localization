@@ -10,20 +10,18 @@
 
 #include <cv.h>
 
-class RubiksCubeLocalizator
-{
+class RubiksCubeLocalizator {
 public:
 	RubiksCubeLocalizator();
 	virtual ~RubiksCubeLocalizator();
-	bool locateCube(IplImage *image);
+	bool locateCube(cv::Mat& image);
 protected:
-	IplImage *filteredImage;
-	IplImage *binaryImage;
-	IplImage *segmentedImage;
 
-	void doFiltering(IplImage *image);
-	void doBinarization(IplImage *image);
-	void doSegmentation(IplImage *image);
+	//cv::Mat binaryImage;
+	//cv::Mat segmentedImage;
+
+	void doBinarization(const cv::Mat& image);
+	//void doSegmentation(const cv::Mat& image);
 };
 
 #endif /* RUBIKSCUBELOCALIZATOR_H_ */

@@ -1,5 +1,7 @@
 #include <cstdio>
 #include <iostream>
+#include <string>
+#include <cv.h>
 #include <highgui.h>
 
 #include <boost/program_options.hpp>
@@ -9,63 +11,46 @@
 //using namespace boost::program_options;
 namespace po = boost::program_options;
 using namespace std;
+using namespace cv;
+
 int main(int argc, char** argv)
 {
-	po::options_description desc("Allowed optionsssssssss");
-	desc.add_options()("help", "produce help message")("compression",
-			po::value<int>(), "set compression level");
+	string configFile;
+	po::options_description programOptions("POBR - Rubik\'s cube recognition - Mateusz Boryn 2010");
+	programOptions.add_options()("help", "print help")("image,i", po::value<string>(), "image file to load")("config,c", po::value<string>(&configFile)->default_value("rkl.conf"), "image file to load");
 
 	po::variables_map vm;
-	po::store(po::parse_command_line(argc, argv, desc), vm);
+	po::store(po::parse_command_line(argc, argv, programOptions), vm);
 	po::notify(vm);
-	if (vm.count("help"))
-	{
-		cout << desc << "\n";
-		return 1;
-	}
-	if (vm.count("compression"))
-	{
-		cout << "Compression level was set to " << vm["compression"].as<int> ()
-				<< ".\n";
-	}
-	else
-	{
-		cout << "Compression level was not set.\n";
-	}
-	return 0;
-
-	if (argc != 2)
-	{
-		printf("Uzycie: %s <plik z obrazkiem>\n", argv[0]);
+	if (vm.count("help")) {
+		cout << programOptions << "\n";
 		return 1;
 	}
 
-	char *imageFilename = argv[1];
-
-	printf("Wczytywanie pliku \"%s\"\n", imageFilename);
-	IplImage* original = cvLoadImage(imageFilename);
-	if (original == NULL)
-	{
-		printf("Nie udalo sie wczytac pliku.\n");
+	string imageFilename;
+	if (vm.count("image")) {
+		imageFilename = vm["image"].as<string> ();
+		cout << "Image file: " << imageFilename << ".\n";
+	} else {
+		cout << "No image file supplied.\n" << programOptions << "\n";
 		return 1;
 	}
-	IplImage* afterLocalization = cvCloneImage(original);
-	cvNamedWindow("Oryginalny", CV_WINDOW_AUTOSIZE );
 
-	cvShowImage("Oryginalny", original);
+	Mat original = imread(imageFilename.c_str());
+	if (original.data == NULL) {
+		cout << "Error loading image file.\n" << programOptions << "\n";
+		return 1;
+	}
+	Mat afterLocalization = original.clone();
+	namedWindow("Original", CV_WINDOW_AUTOSIZE);
+
+	imshow("Original", original);
 
 	RubiksCubeLocalizator rkl;
-	if (rkl.locateCube(afterLocalization))
-	{
-		printf("Zlokalizowano kostke.\n");
-		cvNamedWindow("Po lokalizacji");
-		cvShowImage("Po lokalizacji", afterLocalization);
+	if (rkl.locateCube(afterLocalization)) {
+		namedWindow("After localization", CV_WINDOW_AUTOSIZE);
+		imshow("After localization", afterLocalization);
 	}
 
 	cvWaitKey(0);
-
-	cvReleaseImage(&original);
-	cvReleaseImage(&afterLocalization);
-	cvDestroyWindow("Po lokalizacji");
-	cvDestroyWindow("Oryginalny");
 }

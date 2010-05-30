@@ -11,5 +11,9 @@ SET(rubiks_cube_localization_LIBRARIES
 
 ADD_DEFINITIONS(-Wall -pedantic)
 
-ADD_EXECUTABLE(rkl main.cpp RubiksCubeLocalizator.cpp)
+
+SET(rubiks_cube_localization_SOURCES main.cpp RubiksCubeLocalizator.cpp RKLConfig.cpp)
+
+ADD_EXECUTABLE(rkl ${rubiks_cube_localization_SOURCES})
+
 TARGET_LINK_LIBRARIES(rkl ${rubiks_cube_localization_LIBRARIES})
