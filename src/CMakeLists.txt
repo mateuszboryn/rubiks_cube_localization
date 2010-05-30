@@ -1,14 +1,15 @@
-cmake_minimum_required(VERSION 2.8)
+PROJECT(rubiks_cube_localization)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
-#find_package(Boost REQUIRED)
-#set(BOOST_INCLUDEDIR "/usr/include/boost/")
+FIND_PACKAGE(Boost REQUIRED program_options)
+FIND_PACKAGE(OpenCV REQUIRED)
 
-project(rubiks_cube_localization)
-add_executable(rkl main.cpp RubiksCubeLocalizator.cpp)
-
-execute_process(COMMAND pkg-config opencv --cflags --libs
-	OUTPUT_VARIABLE opencv_flags
+SET(rubiks_cube_localization_LIBRARIES 
+	${Boost_PROGRAM_OPTIONS_LIBRARY}
+	${OpenCV_LIBS}
 )
-STRING(REGEX REPLACE "\n" " " opencv_flags "${opencv_flags}")
-set(CMAKE_CXX_FLAGS "${opencv_flags} -Wall -pedantic")
 
+ADD_DEFINITIONS(-Wall -pedantic)
+
+ADD_EXECUTABLE(rkl main.cpp RubiksCubeLocalizator.cpp)
+TARGET_LINK_LIBRARIES(rkl ${rubiks_cube_localization_LIBRARIES})
