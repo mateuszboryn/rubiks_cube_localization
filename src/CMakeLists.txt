@@ -26,6 +26,9 @@ SET(rubiks_cube_localization_SOURCES
 	SizeFilter.cpp
 	RKPattern.cpp
 	RKWall.cpp
+	ImageSource.cpp
+	OpenCvVideoCaptureSource.cpp
+	FileSource.cpp
 )
 
 ADD_EXECUTABLE(rkl ${rubiks_cube_localization_SOURCES})

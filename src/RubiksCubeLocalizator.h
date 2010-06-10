@@ -16,6 +16,9 @@
 #include "ColorClassifier.h"
 #include "RKLConfig.h"
 #include "RKWall.h"
+#include "RKPattern.h"
+#include "ShapeFilter.h"
+#include "SizeFilter.h"
 
 class RubiksCubeLocalizator {
 public:
@@ -32,6 +35,12 @@ protected:
 	Segmentation segmentation;
 
 	int minSegmentArea;
+
+	cv::Mat filteredImage;
+	cv::Mat colorClassifiedImage;
+	RKPattern pattern;
+	SizeFilter sizeFilter;
+	ShapeFilter shapeFilter;
 };
 
 #endif /* RUBIKSCUBELOCALIZATOR_H_ */

@@ -5,15 +5,20 @@
 #include <highgui.h>
 
 #include <boost/program_options.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include "RubiksCubeLocalizator.h"
 #include "RKLConfig.h"
 #include "logger.h"
+#include "OpenCvVideoCaptureSource.h"
+#include "FileSource.h"
 
-//using namespace boost::program_options;
 namespace po = boost::program_options;
 using namespace std;
 using namespace cv;
+using boost::shared_ptr;
+
+void showImage(const char* label, const Mat& image);
 
 int main(int argc, char** argv)
 {
@@ -21,10 +26,14 @@ int main(int argc, char** argv)
 		// process command line options
 		string configFile;
 		po::options_description programOptions("POBR - Rubik\'s cube recognition - Mateusz Boryn 2010");
-		programOptions.add_options()("help", "print help")("image,i", po::value<string>(), "image file to load")(
-				"config,c", po::value<string>(&configFile)->default_value("rkl.conf"), "config file")("log", po::value<
-				bool>(&log_enabled)->default_value(false), "print more info")("log_dbg", po::value<bool>(
-				&log_dbg_enabled)->default_value(false), "print even more info");
+		programOptions.add_options()("help", "print help");
+		programOptions.add_options()("image,i", po::value<string>(), "image file to load");
+		programOptions.add_options()("config,c", po::value<string>(&configFile)->default_value("rkl.conf"),
+				"config file");
+		programOptions.add_options()("log", po::value<bool>(&log_enabled)->default_value(false), "print more info");
+		programOptions.add_options()("log_dbg", po::value<bool>(&log_dbg_enabled)->default_value(false),
+				"print even more info");
+		programOptions.add_options()("camera-number", po::value<int>(), "number of camera device");
 
 		po::variables_map vm;
 		po::store(po::parse_command_line(argc, argv, programOptions), vm);
@@ -40,47 +49,47 @@ int main(int argc, char** argv)
 
 		RubiksCubeLocalizator rkl(config);
 
+		shared_ptr<ImageSource> source;
+
 		string imageFilename;
 		if (vm.count("image")) {
 			imageFilename = vm["image"].as<string> ();
 			cout << "Image file: " << imageFilename << ".\n";
+			source = shared_ptr<ImageSource> (new FileSource(imageFilename));
+		} else if (vm.count("camera-number")) {
+			int cam_no = vm["camera-number"].as<int> ();
+			cout << "cam_no: " << cam_no << ".\n";
+			source = shared_ptr<ImageSource> (new OpenCvVideoCaptureSource(cam_no));
 		} else {
-			throw std::runtime_error("Image file not supplied.");
+			throw std::runtime_error("No source supplied.");
 		}
 
-		Mat original = imread(imageFilename.c_str());
-		if (original.data == NULL) {
-			cout << "Error loading image file.\n" << programOptions << "\n";
-			return 1;
-		}
-		namedWindow("Original", CV_WINDOW_AUTOSIZE);
-		imshow("Original", original);
+		Mat image;
 
-		if (rkl.locateCube(original)) {
-			Mat afterLocalization = original.clone();
-			for (int i = 0; i < rkl.walls.size(); ++i) {
-				if(rkl.walls[i].bricks.size() == 0){
-					continue;
-				}
-				Point p1, p2;
-				int lineColor = 0;
-				p1 = rkl.walls[i].bricks[0].getMassCenter();
-				circle(afterLocalization, p1, 5, CV_RGB(255 - lineColor, lineColor, 0), 2);
-				for (int j = 1; j < rkl.walls[i].bricks.size(); ++j) {
-					p2= rkl.walls[i].bricks[j].getMassCenter();
-					lineColor = j * 255 / rkl.walls[i].bricks.size();
-					line(afterLocalization, p1, p2, CV_RGB(255 - lineColor, lineColor, 0));
-					circle(afterLocalization, p2, 5, CV_RGB(255 - lineColor, lineColor, 0), 2);
-					p1 = p2;
+		namedWindow("Kostka rubika", CV_WINDOW_AUTOSIZE);
+		while (1) {
+			source->waitForFrame();
+			source->getFrame(image);
+			if (rkl.locateCube(image)) {
+				for (int i = 0; i < rkl.walls.size(); ++i) {
+					rkl.walls[i].draw(image);
 				}
 			}
 
-			namedWindow("After localization", CV_WINDOW_AUTOSIZE);
-			imshow("After localization", afterLocalization);
-		}
+			imshow("Kostka rubika", image);
 
-		cvWaitKey(0);
+			if (waitKey(50) == 27) {
+				break;
+			}
+		}
 	} catch (const exception& ex) {
 		cout << "Error: " << ex.what() << endl;
 	}
 }
+
+void showImage(const char* label, const Mat& image)
+{
+	namedWindow(label, CV_WINDOW_AUTOSIZE);
+	imshow(label, image);
+}
+

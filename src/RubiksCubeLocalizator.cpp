@@ -15,9 +15,6 @@
 
 #include "RubiksCubeLocalizator.h"
 #include "logger.h"
-#include "ShapeFilter.h"
-#include "SizeFilter.h"
-#include "RKPattern.h"
 
 using namespace std;
 using namespace cv;
@@ -36,25 +33,23 @@ RubiksCubeLocalizator::~RubiksCubeLocalizator()
 
 bool RubiksCubeLocalizator::locateCube(Mat& image)
 {
-	Mat filteredImage;
 	medianBlur(image, filteredImage, 3);
 
-	if (log_dbg_enabled) {
-		namedWindow("filteredImage", CV_WINDOW_AUTOSIZE);
-		imshow("filteredImage", filteredImage);
-	}
+	//	if (log_dbg_enabled) {
+	//		namedWindow("filteredImage", CV_WINDOW_AUTOSIZE);
+	//		imshow("filteredImage", filteredImage);
+	//	}
 
-//	Mat afterErosion;
-//	erode(filteredImage, afterErosion, Mat());
+	//	Mat afterErosion;
+	//	erode(filteredImage, afterErosion, Mat());
 
-//	if (log_dbg_enabled) {
-//		namedWindow("afterErosion", CV_WINDOW_AUTOSIZE);
-//		imshow("afterErosion", afterErosion);
-//	}
+	//	if (log_dbg_enabled) {
+	//		namedWindow("afterErosion", CV_WINDOW_AUTOSIZE);
+	//		imshow("afterErosion", afterErosion);
+	//	}
 
-	Mat colorClassifiedImage;
 	colorClassifiedImage = colorClassifier.classify(filteredImage);
-	if (log_enabled) {
+	if (log_dbg_enabled) {
 		Mat img = convertIndexedToRgb(colorClassifiedImage);
 		namedWindow("colorsClassified", CV_WINDOW_AUTOSIZE);
 		imshow("colorsClassified", img);
@@ -64,7 +59,6 @@ bool RubiksCubeLocalizator::locateCube(Mat& image)
 
 	log("number of segments: %d\n", segmentation.segments.size());
 
-	SizeFilter sizeFilter;
 	sizeFilter.minArea = 100;
 	sizeFilter.maxArea = image.size().width * image.size().width / 9;
 	sizeFilter.filter(segmentation.segments);
@@ -78,7 +72,6 @@ bool RubiksCubeLocalizator::locateCube(Mat& image)
 		}
 	}
 
-	ShapeFilter shapeFilter;
 	ImageInvariants min(0.162, -INFINITY, -INFINITY, -INFINITY, -INFINITY, -INFINITY, 6.5e-3);
 	ImageInvariants max(0.175, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, 7.5e-3);
 
@@ -87,18 +80,17 @@ bool RubiksCubeLocalizator::locateCube(Mat& image)
 
 	shapeFilter.filter(segmentation.segments);
 
-	if (log_dbg_enabled) {
-		for (int i = 0; i < segmentation.segments.size(); ++i) {
-			char txt[123];
-			sprintf(txt, "Segment %d", i);
-			namedWindow(txt, CV_WINDOW_AUTOSIZE);
-			imshow(txt, segmentation.segments[i].getImage());
-			log("%s: M1: %g, M7: %g, colorClass: %d\n", txt, segmentation.segments[i].getInvariants().M1,
-					segmentation.segments[i].getInvariants().M7, segmentation.segments[i].getColorClass());
-		}
-	}
+//	if (log_dbg_enabled) {
+//		for (int i = 0; i < segmentation.segments.size(); ++i) {
+//			char txt[123];
+//			sprintf(txt, "Segment %d", i);
+//			namedWindow(txt, CV_WINDOW_AUTOSIZE);
+//			imshow(txt, segmentation.segments[i].getImage());
+//			log("%s: M1: %g, M7: %g, colorClass: %d\n", txt, segmentation.segments[i].getInvariants().M1,
+//					segmentation.segments[i].getInvariants().M7, segmentation.segments[i].getColorClass());
+//		}
+//	}
 
-	RKPattern pattern;
 	walls = pattern.findCube(segmentation.segments);
 
 	return walls.size() > 0;

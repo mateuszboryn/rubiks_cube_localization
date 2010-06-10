@@ -17,7 +17,8 @@ class RKWall {
 public:
 	RKWall(const std::vector<Segment>& bricks);
 	virtual ~RKWall();
-//protected:
+	void draw(cv::Mat& image);
+protected:
 	std::vector<Segment> bricks;
 };
 
