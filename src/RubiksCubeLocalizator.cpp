@@ -24,17 +24,20 @@ RubiksCubeLocalizator::RubiksCubeLocalizator(const RKLConfig & config) :
 {
 	minSegmentArea = 100;
 
-	colorClassifier.colors = config.colors;
+	colorClassifier.setColors(config.colors);
+
+	//	namedWindow("colorsClassified", CV_WINDOW_AUTOSIZE);
 }
 
 RubiksCubeLocalizator::~RubiksCubeLocalizator()
 {
 }
 
-bool RubiksCubeLocalizator::locateCube(Mat& image)
+bool RubiksCubeLocalizator::locateCube(const Mat& image)
 {
+//	p("1");
 	medianBlur(image, filteredImage, 3);
-
+//	p("2");
 	//	if (log_dbg_enabled) {
 	//		namedWindow("filteredImage", CV_WINDOW_AUTOSIZE);
 	//		imshow("filteredImage", filteredImage);
@@ -49,15 +52,14 @@ bool RubiksCubeLocalizator::locateCube(Mat& image)
 	//	}
 
 	colorClassifiedImage = colorClassifier.classify(filteredImage);
-	if (log_dbg_enabled) {
-		Mat img = convertIndexedToRgb(colorClassifiedImage);
-		namedWindow("colorsClassified", CV_WINDOW_AUTOSIZE);
-		imshow("colorsClassified", img);
-	}
+//	p("3");
+	//	if (log_dbg_enabled) {
+	// showIndexedImage(colorClassifiedImage);
+	//	}
 
 	segmentation.extractAllSegments(colorClassifiedImage);
-
-	log("number of segments: %d\n", segmentation.segments.size());
+//	p("4");
+	log_dbg("number of segments: %d\n", segmentation.segments.size());
 
 	sizeFilter.minArea = 100;
 	sizeFilter.maxArea = image.size().width * image.size().width / 9;
@@ -65,7 +67,7 @@ bool RubiksCubeLocalizator::locateCube(Mat& image)
 
 	if (log_dbg_enabled) {
 		for (int i = 0; i < segmentation.segments.size(); ++i) {
-			log("Size-Filtered %d: (%d, %d) M1: %g, M7: %g, colorClass: %d\n", i,
+			log_dbg("Size-Filtered %d: (%d, %d) M1: %g, M7: %g, colorClass: %d\n", i,
 					segmentation.segments[i].getMassCenter().x, segmentation.segments[i].getMassCenter().y,
 					segmentation.segments[i].getInvariants().M1, segmentation.segments[i].getInvariants().M7,
 					segmentation.segments[i].getColorClass());
@@ -79,28 +81,28 @@ bool RubiksCubeLocalizator::locateCube(Mat& image)
 	shapeFilter.max = max;
 
 	shapeFilter.filter(segmentation.segments);
-
-//	if (log_dbg_enabled) {
-//		for (int i = 0; i < segmentation.segments.size(); ++i) {
-//			char txt[123];
-//			sprintf(txt, "Segment %d", i);
-//			namedWindow(txt, CV_WINDOW_AUTOSIZE);
-//			imshow(txt, segmentation.segments[i].getImage());
-//			log("%s: M1: %g, M7: %g, colorClass: %d\n", txt, segmentation.segments[i].getInvariants().M1,
-//					segmentation.segments[i].getInvariants().M7, segmentation.segments[i].getColorClass());
-//		}
-//	}
+//	p("5");
+	//	if (log_dbg_enabled) {
+	//		for (int i = 0; i < segmentation.segments.size(); ++i) {
+	//			char txt[123];
+	//			sprintf(txt, "Segment %d", i);
+	//			namedWindow(txt, CV_WINDOW_AUTOSIZE);
+	//			imshow(txt, segmentation.segments[i].getImage());
+	//			log("%s: M1: %g, M7: %g, colorClass: %d\n", txt, segmentation.segments[i].getInvariants().M1,
+	//					segmentation.segments[i].getInvariants().M7, segmentation.segments[i].getColorClass());
+	//		}
+	//	}
 
 	walls = pattern.findCube(segmentation.segments);
-
+//	p("6");
 	return walls.size() > 0;
 }
 
-cv::Mat RubiksCubeLocalizator::convertIndexedToRgb(const cv::Mat& indexedImage)
+void RubiksCubeLocalizator::showIndexedImage(const cv::Mat& indexedImage)
 {
-	Mat rgb(indexedImage.size(), CV_8UC3);
-	vector<Mat> planes;
-	split(rgb, planes);
+	classifiedRgb.create(indexedImage.size(), CV_8UC3);
+
+	split(classifiedRgb, classifiedRgbPlanes);
 
 	int w = indexedImage.size().width;
 	int h = indexedImage.size().height;
@@ -109,14 +111,18 @@ cv::Mat RubiksCubeLocalizator::convertIndexedToRgb(const cv::Mat& indexedImage)
 			int colorClass = indexedImage.at<int> (y, x);
 			for (int i = 0; i < config.colors.size(); ++i) {
 				if (1 << i == colorClass) {
-					planes[0].at<uchar> (y, x) = config.colors[i].b;
-					planes[1].at<uchar> (y, x) = config.colors[i].g;
-					planes[2].at<uchar> (y, x) = config.colors[i].r;
+					classifiedRgbPlanes[0].at<uchar> (y, x) = config.colors[i].b;
+					classifiedRgbPlanes[1].at<uchar> (y, x) = config.colors[i].g;
+					classifiedRgbPlanes[2].at<uchar> (y, x) = config.colors[i].r;
+				} else {
+					classifiedRgbPlanes[0].at<uchar> (y, x) = 0;
+					classifiedRgbPlanes[1].at<uchar> (y, x) = 0;
+					classifiedRgbPlanes[2].at<uchar> (y, x) = 0;
 				}
 			}
 		}
 	}
 
-	merge(planes, rgb);
-	return rgb;
+	merge(classifiedRgbPlanes, classifiedRgb);
+	imshow("colorsClassified", classifiedRgb);
 }

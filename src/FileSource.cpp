@@ -29,16 +29,19 @@ bool FileSource::isFrameReady()
 
 void FileSource::waitForFrame()
 {
-	if (fileLoaded) {
-		sleep(UINT_MAX);
-	}
+	//	if (fileLoaded) {
+	//		sleep(UINT_MAX);
+	//	}
 }
 
-void FileSource::getFrame(cv::Mat& image)
+void FileSource::getFrame(cv::Mat& imageRead)
 {
-	image = imread(fileName.c_str());
-	if (image.data == NULL) {
-		throw runtime_error("image.data == NULL");
+	if (!fileLoaded) {
+		image = imread(fileName.c_str());
+		if (image.data == NULL) {
+			throw runtime_error("image.data == NULL");
+		}
+		fileLoaded = true;
 	}
-	fileLoaded = true;
+	imageRead = image.clone();
 }

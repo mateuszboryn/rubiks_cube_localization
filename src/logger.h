@@ -11,6 +11,8 @@
 /** Is log enabled*/
 extern bool log_enabled, log_dbg_enabled;
 
+void p(const char *fmt, ...);
+
 /**
  * Print message to the console only if logEnabled is set to true.
  * @param fmt printf-like format

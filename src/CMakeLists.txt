@@ -9,8 +9,7 @@ SET(rubiks_cube_localization_LIBRARIES
 	${OpenCV_LIBS}
 )
 
-ADD_DEFINITIONS(-Wall -pedantic -Wno-sign-compare)
-
+ADD_DEFINITIONS(-Wall -pedantic -Wno-sign-compare -p  -O3)
 
 SET(rubiks_cube_localization_SOURCES 
 	main.cpp
@@ -32,5 +31,7 @@ SET(rubiks_cube_localization_SOURCES
 )
 
 ADD_EXECUTABLE(rkl ${rubiks_cube_localization_SOURCES})
+
+SET_TARGET_PROPERTIES(rkl PROPERTIES LINK_FLAGS -p)
 
 TARGET_LINK_LIBRARIES(rkl ${rubiks_cube_localization_LIBRARIES})

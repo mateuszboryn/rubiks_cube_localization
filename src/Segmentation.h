@@ -18,7 +18,7 @@ public:
 	Segmentation();
 	virtual ~Segmentation();
 
-	void extractAllSegments(const cv::Mat& image);
+	void extractAllSegments(cv::Mat& image);
 
 	std::vector<Segment> segments;
 protected:

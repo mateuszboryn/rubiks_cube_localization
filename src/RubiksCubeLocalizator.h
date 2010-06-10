@@ -24,12 +24,11 @@ class RubiksCubeLocalizator {
 public:
 	RubiksCubeLocalizator(const RKLConfig & config);
 	virtual ~RubiksCubeLocalizator();
-	bool locateCube(cv::Mat& image);
+	bool locateCube(const cv::Mat& image);
 
 	std::vector<RKWall> walls;
 protected:
 	RKLConfig config;
-	cv::Mat convertIndexedToRgb(const cv::Mat& indexedImage);
 
 	ColorClassifier colorClassifier;
 	Segmentation segmentation;
@@ -38,9 +37,15 @@ protected:
 
 	cv::Mat filteredImage;
 	cv::Mat colorClassifiedImage;
+	//cv::Mat colorClassifiedImageRGB;
 	RKPattern pattern;
 	SizeFilter sizeFilter;
 	ShapeFilter shapeFilter;
+
+
+	void showIndexedImage(const cv::Mat& indexedImage);
+	cv::Mat classifiedRgb;
+	std::vector<cv::Mat> classifiedRgbPlanes;
 };
 
 #endif /* RUBIKSCUBELOCALIZATOR_H_ */

@@ -78,9 +78,10 @@ int main(int argc, char** argv)
 
 			imshow("Kostka rubika", image);
 
-			if (waitKey(50) == 27) {
+			if (waitKey(3) == 27) {
 				break;
 			}
+			p(".");
 		}
 	} catch (const exception& ex) {
 		cout << "Error: " << ex.what() << endl;

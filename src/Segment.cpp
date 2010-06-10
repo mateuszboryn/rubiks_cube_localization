@@ -27,28 +27,11 @@ Segment::Segment(cv::Mat& image, int area, int colorClass /*, cv::Point leftUppe
 {
 }
 
-Segment::~Segment()
-{
-}
-
 //cv::Rect Segment::getRect()
 //{
 //	return Rect(leftUpperCorner.x, leftUpperCorner.y, rightLowerCorner.x - leftUpperCorner.x, rightLowerCorner.y - rightLowerCorner.y);
 //}
 
-cv::Mat& Segment::getImage()
-{
-	return image;
-}
-const cv::Mat& Segment::getImage() const
-{
-	return image;
-}
-
-int Segment::getArea() const
-{
-	return area;
-}
 
 #define sqr(x) ((x)*(x))
 
@@ -65,11 +48,11 @@ void Segment::calculateMoments() const
 
 	invariantsCalculated = true;
 
-	log("Segment::calculateMoments() color class %d:\n", colorClass);
+//	log("Segment::calculateMoments() color class %d:\n", colorClass);
 //	log("    m00=%g m10=%g m01=%g m20=%g m11=%g m02=%g %g %g %g %g\n", m.m00, m.m10, m.m01, m.m20, m.m11, m.m02, m.m30, m.m21, m.m12, m.m03);
 //	log("    area: %d (m00=%g)\n", area, m.m00);
-	log("    (x0, y0) = (%d, %d)\n", massCenter.x, massCenter.y);
-	log("    M1: %g, M4: %g, M7: %g\n", invariants.M1, invariants.M4, invariants.M7);
+//	log("    (x0, y0) = (%d, %d)\n", massCenter.x, massCenter.y);
+//	log("    M1: %g, M4: %g, M7: %g\n", invariants.M1, invariants.M4, invariants.M7);
 }
 
 const ImageInvariants& Segment::getInvariants() const
@@ -86,9 +69,4 @@ const cv::Point& Segment::getMassCenter() const
 		calculateMoments();
 	}
 	return massCenter;
-}
-
-int Segment::getColorClass() const
-{
-	return colorClass;
 }

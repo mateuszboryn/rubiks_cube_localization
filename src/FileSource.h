@@ -19,11 +19,12 @@ public:
 
 	virtual bool isFrameReady();
 	virtual void waitForFrame();
-	virtual void getFrame(cv::Mat& image);
+	virtual void getFrame(cv::Mat& imageRead);
 
 private:
 	std::string fileName;
 	bool fileLoaded;
+	cv::Mat image;
 };
 
 #endif /* FILESOURCE_H_ */

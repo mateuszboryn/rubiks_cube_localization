@@ -43,4 +43,6 @@ void OpenCvVideoCaptureSource::getFrame(cv::Mat& image)
 	if (!capture.retrieve(image)) {
 		log("!capture.retrieve(image)\n");
 	}
+
+	log("OpenCvVideoCaptureSource::getFrame: image.type(): %d\n", image.type());
 }

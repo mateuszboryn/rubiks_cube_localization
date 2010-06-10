@@ -21,20 +21,20 @@ Segmentation::~Segmentation()
 {
 }
 
-void Segmentation::extractAllSegments(const cv::Mat& image)
+void Segmentation::extractAllSegments(cv::Mat& image)
 {
+	segments.clear();
 	if (image.type() != CV_32S) {
 		throw runtime_error("Segmentation::segmentAllSegments(): image.type() != CV_32S");
 	}
 
 	int w = image.size().width;
 	int h = image.size().height;
-	Mat imageCopy = image.clone();
 	for (int y = 0; y < h; ++y) {
 		for (int x = 0; x < w; ++x) {
-			int colorClass = imageCopy.at<int> (y, x);
+			int colorClass = image.at<int> (y, x);
 			if (colorClass > 0) {
-				segments.push_back(extractSegment(imageCopy, y, x, colorClass));
+				segments.push_back(extractSegment(image, y, x, colorClass));
 			}
 		}
 	}

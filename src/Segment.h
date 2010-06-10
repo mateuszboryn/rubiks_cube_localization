@@ -14,7 +14,8 @@
 class ImageInvariants {
 public:
 
-	ImageInvariants(double M1 = 0, double M2 = 0, double M3 = 0, double M4 = 0, double M5 = 0, double M6 = 0, double M7 = 0);
+	ImageInvariants(double M1 = 0, double M2 = 0, double M3 = 0, double M4 = 0, double M5 = 0, double M6 = 0,
+			double M7 = 0);
 
 	double M1;
 	double M2;
@@ -30,14 +31,31 @@ public:
 class Segment {
 public:
 	Segment(cv::Mat& image, int area, int colorClass /*, cv::Point leftUpperCorner, cv::Point rightLowerCorner*/);
-	virtual ~Segment();
+	virtual ~Segment()
+	{
+	}
 
-	cv::Mat& getImage();
-	const cv::Mat& getImage() const;
-	int getArea() const;
+	cv::Mat& getImage()
+	{
+		return image;
+	}
+
+	const cv::Mat& getImage() const
+	{
+		return image;
+	}
+
+	int getArea() const
+	{
+		return area;
+	}
 	const ImageInvariants& getInvariants() const;
 	const cv::Point& getMassCenter() const;
-	int getColorClass() const;
+	int getColorClass() const
+	{
+		return colorClass;
+	}
+
 protected:
 	cv::Mat image;
 	int area;
