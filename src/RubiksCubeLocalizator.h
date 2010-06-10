@@ -12,16 +12,26 @@
 #include <boost/shared_ptr.hpp>
 #include <vector>
 
-#include "Segment.h"
+#include "Segmentation.h"
+#include "ColorClassifier.h"
+#include "RKLConfig.h"
+#include "RKWall.h"
 
 class RubiksCubeLocalizator {
 public:
-	RubiksCubeLocalizator();
+	RubiksCubeLocalizator(const RKLConfig & config);
 	virtual ~RubiksCubeLocalizator();
 	bool locateCube(cv::Mat& image);
+
+	std::vector<RKWall> walls;
 protected:
-	cv::Mat colorClassification(const cv::Mat& yCrCbImage);
-	std::vector<boost::shared_ptr<Segment> > segmentation(const cv::Mat& image);
+	RKLConfig config;
+	cv::Mat convertIndexedToRgb(const cv::Mat& indexedImage);
+
+	ColorClassifier colorClassifier;
+	Segmentation segmentation;
+
+	int minSegmentArea;
 };
 
 #endif /* RUBIKSCUBELOCALIZATOR_H_ */

@@ -8,12 +8,19 @@
 #ifndef COLORDEFINITION_H_
 #define COLORDEFINITION_H_
 
+#include <string>
+
 class ColorDefinition {
 public:
-	ColorDefinition();
+	ColorDefinition(const std::string& definition);
+	//ColorDefinition(const ColorDefinition & o);
 	virtual ~ColorDefinition();
+
+	//std::string name;
+	//int rgbRepresentation;
+	int min0, max0, min1, max1, min2, max2;
+	int r,g,b;
 protected:
-	int rgbRepresentation;
 
 };
 

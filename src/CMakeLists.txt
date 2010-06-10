@@ -9,10 +9,24 @@ SET(rubiks_cube_localization_LIBRARIES
 	${OpenCV_LIBS}
 )
 
-ADD_DEFINITIONS(-Wall -pedantic)
+ADD_DEFINITIONS(-Wall -pedantic -Wno-sign-compare)
 
 
-SET(rubiks_cube_localization_SOURCES main.cpp RubiksCubeLocalizator.cpp RKLConfig.cpp)
+SET(rubiks_cube_localization_SOURCES 
+	main.cpp
+	RubiksCubeLocalizator.cpp
+	RKLConfig.cpp
+	logger.cpp
+	ColorDefinition.cpp
+	Segment.cpp
+	Segmentation.cpp
+	ColorClassifier.cpp
+	SegmentFilter.cpp
+	ShapeFilter.cpp
+	SizeFilter.cpp
+	RKPattern.cpp
+	RKWall.cpp
+)
 
 ADD_EXECUTABLE(rkl ${rubiks_cube_localization_SOURCES})
 
