@@ -16,9 +16,9 @@ SizeFilter::~SizeFilter()
 {
 }
 
-void SizeFilter::filter(std::vector<Segment>& segments)
+void SizeFilter::filter(std::list<Segment>& segments)
 {
-	std::vector<Segment>::iterator it;
+	std::list<Segment>::iterator it;
 	for (it = segments.begin(); it != segments.end(); ) {
 		if (!(minArea < it->getArea() && it->getArea() < maxArea)) {
 			it = segments.erase(it);

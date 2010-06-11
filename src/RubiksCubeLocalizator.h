@@ -26,7 +26,7 @@ public:
 	virtual ~RubiksCubeLocalizator();
 	bool locateCube(const cv::Mat& image);
 
-	std::vector<RKWall> walls;
+	std::list<RKWall> walls;
 protected:
 	RKLConfig config;
 

@@ -15,7 +15,7 @@ public:
 	ShapeFilter();
 	virtual ~ShapeFilter();
 
-	virtual void filter(std::vector<Segment>& segments);
+	virtual void filter(std::list<Segment>& segments);
 
 	ImageInvariants min, max;
 };

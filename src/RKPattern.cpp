@@ -12,6 +12,7 @@
 #include "logger.h"
 
 using namespace std;
+using namespace cv;
 
 RKPattern::RKPattern()
 {
@@ -23,8 +24,8 @@ RKPattern::~RKPattern()
 
 class BricksSort {
 public:
-	BricksSort(double x0, double y0) :
-		x0(x0), y0(y0)
+	BricksSort(Point p) :
+		x0(p.x), y0(p.y)
 	{
 	}
 
@@ -47,31 +48,29 @@ private:
 	double x0, y0;
 };
 
-const std::vector<RKWall>& RKPattern::findCube(const vector<Segment>& segments)
+const std::list<RKWall>& RKPattern::findCube(const list<Segment>& segments)
 {
 	walls.clear();
 
-	vector<Segment>::const_iterator it;
+	list<Segment>::const_iterator it;
 	for (it = segments.begin(); it != segments.end(); ++it) {
-		vector<Segment> closestSegments;
-		closestSegments = findClosestSegments(segments, *it);
+		findClosestSegments(segments, *it);
 
 		if (closestSegments.size() == 9) {
-			vector<pair<Segment, double> > bricksToSort;
 			log("RKPattern::findCube(): closestSegments.size() == 9: ");
-			for (int i = 0; i < closestSegments.size(); ++i) {
-				log("    (%d, %d), area: %d, colorClass: %d\n", closestSegments[i].getMassCenter().x,
-						closestSegments[i].getMassCenter().y, closestSegments[i].getArea(),
-						closestSegments[i].getColorClass());
+
+			vector<Segment>::const_iterator it2;
+			for (it2 = closestSegments.begin(); it2 != closestSegments.end(); ++it2) {
+				log("    (%d, %d), area: %d, colorClass: %d\n", it2->getMassCenter().x, it2->getMassCenter().y,
+						it2->getArea(), it2->getColorClass());
 			}
 
-			BricksSort comp(closestSegments[0].getMassCenter().x, closestSegments[0].getMassCenter().y);
+			BricksSort comp(closestSegments.begin()->getMassCenter());
 
 			sort(++closestSegments.begin(), closestSegments.end(), comp);
 
-
-			if (dist(closestSegments[0].getMassCenter(), closestSegments[2].getMassCenter()) < dist(
-					closestSegments[0].getMassCenter(), closestSegments[1].getMassCenter())) {
+			if (dist(closestSegments.begin()->getMassCenter(), (++(++closestSegments.begin()))->getMassCenter())
+					< dist(closestSegments.begin()->getMassCenter(), (++closestSegments.begin())->getMassCenter())) {
 				rotate(++closestSegments.begin(), --closestSegments.end(), closestSegments.end());
 			}
 
@@ -82,9 +81,8 @@ const std::vector<RKWall>& RKPattern::findCube(const vector<Segment>& segments)
 	return walls;
 }
 
-vector<Segment> RKPattern::findClosestSegments(const vector<Segment>& segments, const Segment& centralSegment)
+void RKPattern::findClosestSegments(const list<Segment>& segments, const Segment& centralSegment)
 {
-	vector<Segment> closestSegments;
 	closestSegments.push_back(centralSegment);
 
 	double minDistance = sqrt(centralSegment.getArea()) / 2;
@@ -95,14 +93,13 @@ vector<Segment> RKPattern::findClosestSegments(const vector<Segment>& segments, 
 	log_dbg("centralSegment: (%d, %d), area: %d\n", centralSegment.getMassCenter().x, centralSegment.getMassCenter().y,
 			centralSegment.getArea());
 
-	vector<Segment>::const_iterator it;
+	list<Segment>::const_iterator it;
 	for (it = segments.begin(); it != segments.end(); ++it) {
 		double d = dist(centralSegment.getMassCenter(), it->getMassCenter());
 		if (minArea <= it->getArea() && it->getArea() <= maxArea && minDistance <= d && d <= maxDistance) {
 			closestSegments.push_back(*it);
 		}
 	}
-	return closestSegments;
 }
 
 double RKPattern::dist(cv::Point p1, cv::Point p2)

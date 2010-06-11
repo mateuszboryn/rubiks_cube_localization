@@ -15,9 +15,9 @@ ShapeFilter::~ShapeFilter()
 {
 }
 
-void ShapeFilter::filter(std::vector<Segment>& segments)
+void ShapeFilter::filter(std::list<Segment>& segments)
 {
-	std::vector<Segment>::iterator it;
+	std::list<Segment>::iterator it;
 	for (it = segments.begin(); it != segments.end();) {
 		if (!(min <= it->getInvariants() && it->getInvariants() <= max)) {
 			it = segments.erase(it);

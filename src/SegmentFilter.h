@@ -9,7 +9,7 @@
 #define SEGMENTFILTER_H_
 
 
-#include <vector>
+#include <list>
 #include <cv.h>
 
 #include "Segment.h"
@@ -19,7 +19,7 @@ public:
 	SegmentFilter();
 	virtual ~SegmentFilter();
 
-	virtual void filter(std::vector<Segment>& segments)=0;
+	virtual void filter(std::list<Segment>& segments)=0;
 };
 
 #endif /* SEGMENTFILTER_H_ */

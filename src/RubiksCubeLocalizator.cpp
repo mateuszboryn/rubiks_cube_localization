@@ -35,9 +35,9 @@ RubiksCubeLocalizator::~RubiksCubeLocalizator()
 
 bool RubiksCubeLocalizator::locateCube(const Mat& image)
 {
-//	p("1");
-	medianBlur(image, filteredImage, 3);
-//	p("2");
+	//	p("1");
+	//medianBlur(image, filteredImage, 3);
+	//	p("2");
 	//	if (log_dbg_enabled) {
 	//		namedWindow("filteredImage", CV_WINDOW_AUTOSIZE);
 	//		imshow("filteredImage", filteredImage);
@@ -51,14 +51,15 @@ bool RubiksCubeLocalizator::locateCube(const Mat& image)
 	//		imshow("afterErosion", afterErosion);
 	//	}
 
-	colorClassifiedImage = colorClassifier.classify(filteredImage);
-//	p("3");
+	colorClassifiedImage = colorClassifier.classify(image);
+	//return false;
+	//	p("3");
 	//	if (log_dbg_enabled) {
 	// showIndexedImage(colorClassifiedImage);
 	//	}
 
 	segmentation.extractAllSegments(colorClassifiedImage);
-//	p("4");
+	//	p("4");
 	log_dbg("number of segments: %d\n", segmentation.segments.size());
 
 	sizeFilter.minArea = 100;
@@ -66,11 +67,10 @@ bool RubiksCubeLocalizator::locateCube(const Mat& image)
 	sizeFilter.filter(segmentation.segments);
 
 	if (log_dbg_enabled) {
-		for (int i = 0; i < segmentation.segments.size(); ++i) {
-			log_dbg("Size-Filtered %d: (%d, %d) M1: %g, M7: %g, colorClass: %d\n", i,
-					segmentation.segments[i].getMassCenter().x, segmentation.segments[i].getMassCenter().y,
-					segmentation.segments[i].getInvariants().M1, segmentation.segments[i].getInvariants().M7,
-					segmentation.segments[i].getColorClass());
+		int i=0;
+		for (list<Segment>::iterator it = segmentation.segments.begin(); it != segmentation.segments.begin(); ++it, ++i) {
+			log_dbg("Size-Filtered %d: (%d, %d) M1: %g, M7: %g, colorClass: %d\n", i, it->getMassCenter().x,
+					it->getMassCenter().y, it->getInvariants().M1, it->getInvariants().M7, it->getColorClass());
 		}
 	}
 
@@ -81,7 +81,7 @@ bool RubiksCubeLocalizator::locateCube(const Mat& image)
 	shapeFilter.max = max;
 
 	shapeFilter.filter(segmentation.segments);
-//	p("5");
+	//	p("5");
 	//	if (log_dbg_enabled) {
 	//		for (int i = 0; i < segmentation.segments.size(); ++i) {
 	//			char txt[123];
@@ -92,9 +92,9 @@ bool RubiksCubeLocalizator::locateCube(const Mat& image)
 	//					segmentation.segments[i].getInvariants().M7, segmentation.segments[i].getColorClass());
 	//		}
 	//	}
-
+	return false;
 	walls = pattern.findCube(segmentation.segments);
-//	p("6");
+	//	p("6");
 	return walls.size() > 0;
 }
 

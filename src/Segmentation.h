@@ -9,6 +9,7 @@
 #define SEGMENTATION_H_
 
 #include <vector>
+#include <list>
 #include <cv.h>
 
 #include "Segment.h"
@@ -20,7 +21,7 @@ public:
 
 	void extractAllSegments(cv::Mat& image);
 
-	std::vector<Segment> segments;
+	std::list<Segment> segments;
 protected:
 	Segment extractSegment(cv::Mat& image, int y, int x, int colorClass);
 };

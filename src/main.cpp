@@ -23,6 +23,7 @@ void showImage(const char* label, const Mat& image);
 int main(int argc, char** argv)
 {
 	try {
+		p("sizeof(Segment) %d\n", sizeof(Segment));
 		// process command line options
 		string configFile;
 		po::options_description programOptions("POBR - Rubik\'s cube recognition - Mateusz Boryn 2010");
@@ -67,20 +68,20 @@ int main(int argc, char** argv)
 		Mat image;
 
 		namedWindow("Kostka rubika", CV_WINDOW_AUTOSIZE);
-		while (1) {
+		for (int h = 0; h < 200; ++h) {
 			source->waitForFrame();
 			source->getFrame(image);
 			if (rkl.locateCube(image)) {
-				for (int i = 0; i < rkl.walls.size(); ++i) {
-					rkl.walls[i].draw(image);
+				for (list<RKWall>::const_iterator it = rkl.walls.begin(); it != rkl.walls.end(); ++it) {
+					it->draw(image);
 				}
 			}
 
-			imshow("Kostka rubika", image);
-
-			if (waitKey(3) == 27) {
-				break;
-			}
+			//			imshow("Kostka rubika", image);
+			//
+			//			if (waitKey(3) == 27) {
+			//				break;
+			//			}
 			p(".");
 		}
 	} catch (const exception& ex) {

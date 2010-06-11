@@ -9,6 +9,7 @@
 #define RKPATTERN_H_
 
 #include <cv.h>
+#include <list>
 #include <vector>
 
 #include "Segment.h"
@@ -19,14 +20,15 @@ public:
 	RKPattern();
 	virtual ~RKPattern();
 
-	const std::vector<RKWall>& findCube(const std::vector<Segment>& segments);
+	const std::list<RKWall>& findCube(const std::list<Segment>& segments);
 
 protected:
-	std::vector<Segment> findClosestSegments(const std::vector<Segment>& segments, const Segment& centralSegment);
+	void findClosestSegments(const std::list<Segment>& segments, const Segment& centralSegment);
+	std::vector<Segment> closestSegments;
 
 	double dist(cv::Point p1, cv::Point p2);
 
-	std::vector<RKWall> walls;
+	std::list<RKWall> walls;
 };
 
 #endif /* RKPATTERN_H_ */

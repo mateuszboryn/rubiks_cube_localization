@@ -15,7 +15,7 @@ public:
 	SizeFilter();
 	virtual ~SizeFilter();
 
-	virtual void filter(std::vector<Segment>& segments);
+	virtual void filter(std::list<Segment>& segments);
 
 	int minArea;
 	int maxArea;
