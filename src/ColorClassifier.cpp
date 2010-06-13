@@ -14,7 +14,8 @@
 using namespace std;
 using namespace cv;
 
-ColorClassifier::ColorClassifier()
+ColorClassifier::ColorClassifier() :
+	showColorChannels(false)
 {
 	for (int i = 0; i < 256; ++i) {
 		YClasses[i] = CrClasses[i] = CbClasses[i] = 0;
@@ -50,39 +51,6 @@ void ColorClassifier::setColors(const std::vector<ColorDefinition> & colors)
 	}
 }
 
-//cv::Mat& ColorClassifier::classify(const cv::Mat& image)
-//{
-//	thresholdedImage.create(image.size(), CV_32S);
-//
-//	YCrCb.create(image.size(), CV_8UC3);
-//	cvtColor(image, YCrCb, CV_BGR2YCrCb);
-//
-//	split(YCrCb, planesYCrCb);
-//
-//	if (log_enabled) {
-//		namedWindow("Y", CV_WINDOW_AUTOSIZE);
-//		imshow("Y", planesYCrCb[0]);
-//
-//		namedWindow("Cr", CV_WINDOW_AUTOSIZE);
-//		imshow("Cr", planesYCrCb[1]);
-//
-//		namedWindow("Cb", CV_WINDOW_AUTOSIZE);
-//		imshow("Cb", planesYCrCb[2]);
-//	}
-//
-//	for (int y = 0; y < image.size().height; ++y) {
-//		for (int x = 0; x < image.size().width; ++x) {
-//			uchar Y = planesYCrCb[0].at<uchar> (y, x);
-//			uchar Cr = planesYCrCb[1].at<uchar> (y, x);
-//			uchar Cb = planesYCrCb[2].at<uchar> (y, x);
-//			thresholdedImage.at<int> (y, x) = YClasses[Y] & CrClasses[Cr] & CbClasses[Cb];
-//		}
-//	}
-//
-//	return thresholdedImage;
-//}
-
-
 cv::Mat& ColorClassifier::classify(const cv::Mat& image)
 {
 	thresholdedImage.create(image.size(), CV_32S);
@@ -90,16 +58,17 @@ cv::Mat& ColorClassifier::classify(const cv::Mat& image)
 	YCrCb.create(image.size(), CV_8UC3);
 	cvtColor(image, YCrCb, CV_BGR2YCrCb);
 
-//	if (log_enabled) {
-//		namedWindow("Y", CV_WINDOW_AUTOSIZE);
-//		imshow("Y", planesYCrCb[0]);
-//
-//		namedWindow("Cr", CV_WINDOW_AUTOSIZE);
-//		imshow("Cr", planesYCrCb[1]);
-//
-//		namedWindow("Cb", CV_WINDOW_AUTOSIZE);
-//		imshow("Cb", planesYCrCb[2]);
-//	}
+	if (showColorChannels) {
+		split(YCrCb, planesYCrCb);
+		namedWindow("Y", CV_WINDOW_AUTOSIZE);
+		imshow("Y", planesYCrCb[0]);
+
+		namedWindow("Cr", CV_WINDOW_AUTOSIZE);
+		imshow("Cr", planesYCrCb[1]);
+
+		namedWindow("Cb", CV_WINDOW_AUTOSIZE);
+		imshow("Cb", planesYCrCb[2]);
+	}
 
 	MatIterator_<Vec<uchar, 3> > YCrCbIt = YCrCb.begin<Vec<uchar, 3> > ();
 	MatIterator_<Vec<uchar, 3> > YCrCbEnd = YCrCb.end<Vec<uchar, 3> > ();

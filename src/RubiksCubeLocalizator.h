@@ -22,11 +22,18 @@
 
 class RubiksCubeLocalizator {
 public:
-	RubiksCubeLocalizator(const RKLConfig & config);
+	RubiksCubeLocalizator();
 	virtual ~RubiksCubeLocalizator();
 	bool locateCube(const cv::Mat& image);
 
 	std::list<RKWall> walls;
+
+	void setConfig(const RKLConfig & config);
+	bool showFilteredImage;
+	bool showColorChannels;
+	bool showColorsClassifiedImage;
+	bool showSegments;
+
 protected:
 	RKLConfig config;
 

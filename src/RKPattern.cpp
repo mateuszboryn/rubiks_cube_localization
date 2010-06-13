@@ -56,21 +56,20 @@ const std::list<RKWall>& RKPattern::findCube(const list<Segment>& segments)
 	for (it = segments.begin(); it != segments.end(); ++it) {
 		findClosestSegments(segments, *it);
 
-		if (closestSegments.size() == 9) {
-			log("RKPattern::findCube(): closestSegments.size() == 9: ");
+		if (closestSegments.size() == 9 || closestSegments.size() == 8) {
+			log("RKPattern::findCube(): closestSegments.size() == %d:\n", closestSegments.size());
 
 			vector<Segment>::const_iterator it2;
 			for (it2 = closestSegments.begin(); it2 != closestSegments.end(); ++it2) {
-				log("    (%d, %d), area: %d, colorClass: %d\n", it2->getMassCenter().x, it2->getMassCenter().y,
-						it2->getArea(), it2->getColorClass());
+				log("    (%d, %d), area: %d, colorClass: %d\n", it2->getMassCenter().x, it2->getMassCenter().y, it2->getArea(), it2->getColorClass());
 			}
 
 			BricksSort comp(closestSegments.begin()->getMassCenter());
 
 			sort(++closestSegments.begin(), closestSegments.end(), comp);
 
-			if (dist(closestSegments.begin()->getMassCenter(), (++(++closestSegments.begin()))->getMassCenter())
-					< dist(closestSegments.begin()->getMassCenter(), (++closestSegments.begin())->getMassCenter())) {
+			if (dist(closestSegments.begin()->getMassCenter(), (++(++closestSegments.begin()))->getMassCenter()) < dist(
+					closestSegments.begin()->getMassCenter(), (++closestSegments.begin())->getMassCenter())) {
 				rotate(++closestSegments.begin(), --closestSegments.end(), closestSegments.end());
 			}
 
@@ -83,6 +82,7 @@ const std::list<RKWall>& RKPattern::findCube(const list<Segment>& segments)
 
 void RKPattern::findClosestSegments(const list<Segment>& segments, const Segment& centralSegment)
 {
+	closestSegments.clear();
 	closestSegments.push_back(centralSegment);
 
 	double minDistance = sqrt(centralSegment.getArea()) / 2;
@@ -90,14 +90,14 @@ void RKPattern::findClosestSegments(const list<Segment>& segments, const Segment
 	int minArea = centralSegment.getArea() / 2;
 	int maxArea = centralSegment.getArea() * 2;
 
-	log_dbg("centralSegment: (%d, %d), area: %d\n", centralSegment.getMassCenter().x, centralSegment.getMassCenter().y,
-			centralSegment.getArea());
+	log_dbg("centralSegment: (%d, %d), area: %d\n", centralSegment.getMassCenter().x, centralSegment.getMassCenter().y, centralSegment.getArea());
 
 	list<Segment>::const_iterator it;
 	for (it = segments.begin(); it != segments.end(); ++it) {
 		double d = dist(centralSegment.getMassCenter(), it->getMassCenter());
 		if (minArea <= it->getArea() && it->getArea() <= maxArea && minDistance <= d && d <= maxDistance) {
 			closestSegments.push_back(*it);
+			log_dbg("    segment (%d, %d) matches\n", it->getMassCenter().x, it->getMassCenter().y);
 		}
 	}
 }

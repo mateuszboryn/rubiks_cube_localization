@@ -23,18 +23,21 @@ void showImage(const char* label, const Mat& image);
 int main(int argc, char** argv)
 {
 	try {
-		p("sizeof(Segment) %d\n", sizeof(Segment));
+		RubiksCubeLocalizator rkl;
+
 		// process command line options
 		string configFile;
 		po::options_description programOptions("POBR - Rubik\'s cube recognition - Mateusz Boryn 2010");
 		programOptions.add_options()("help", "print help");
 		programOptions.add_options()("image,i", po::value<string>(), "image file to load");
-		programOptions.add_options()("config,c", po::value<string>(&configFile)->default_value("rkl.conf"),
-				"config file");
+		programOptions.add_options()("config,c", po::value<string>(&configFile)->default_value("rkl.conf"), "config file");
 		programOptions.add_options()("log", po::value<bool>(&log_enabled)->default_value(false), "print more info");
-		programOptions.add_options()("log_dbg", po::value<bool>(&log_dbg_enabled)->default_value(false),
-				"print even more info");
+		programOptions.add_options()("log_dbg", po::value<bool>(&log_dbg_enabled)->default_value(false), "print even more info");
 		programOptions.add_options()("camera-number", po::value<int>(), "number of camera device");
+		programOptions.add_options()("show-filtered", po::value<bool>(&rkl.showFilteredImage)->default_value(false), "show image after filtering");
+		programOptions.add_options()("show-channels", po::value<bool>(&rkl.showColorChannels)->default_value(false), "show color channels");
+		programOptions.add_options()("show-colors", po::value<bool>(&rkl.showColorsClassifiedImage)->default_value(false), "show image after color classification");
+		programOptions.add_options()("show-segments", po::value<bool>(&rkl.showSegments)->default_value(false), "show segments after segments filtering");
 
 		po::variables_map vm;
 		po::store(po::parse_command_line(argc, argv, programOptions), vm);
@@ -47,16 +50,16 @@ int main(int argc, char** argv)
 		// create RKL localizator
 		RKLConfig config;
 		config.readConfig(configFile);
-
-		RubiksCubeLocalizator rkl(config);
+		rkl.setConfig(config);
 
 		shared_ptr<ImageSource> source;
-
+		bool processOnlyOneFrame = false;
 		string imageFilename;
 		if (vm.count("image")) {
 			imageFilename = vm["image"].as<string> ();
 			cout << "Image file: " << imageFilename << ".\n";
 			source = shared_ptr<ImageSource> (new FileSource(imageFilename));
+			processOnlyOneFrame = true;
 		} else if (vm.count("camera-number")) {
 			int cam_no = vm["camera-number"].as<int> ();
 			cout << "cam_no: " << cam_no << ".\n";
@@ -68,7 +71,7 @@ int main(int argc, char** argv)
 		Mat image;
 
 		namedWindow("Kostka rubika", CV_WINDOW_AUTOSIZE);
-		for (int h = 0; h < 200; ++h) {
+		while (1) {
 			source->waitForFrame();
 			source->getFrame(image);
 			if (rkl.locateCube(image)) {
@@ -77,12 +80,17 @@ int main(int argc, char** argv)
 				}
 			}
 
-			//			imshow("Kostka rubika", image);
-			//
-			//			if (waitKey(3) == 27) {
-			//				break;
-			//			}
-			p(".");
+			imshow("Kostka rubika", image);
+
+			if (processOnlyOneFrame) {
+				while (waitKey(0) != 27)
+					;
+				break;
+			} else {
+				if (waitKey(30) == 27) {
+					break;
+				}
+			}
 		}
 	} catch (const exception& ex) {
 		cout << "Error: " << ex.what() << endl;
