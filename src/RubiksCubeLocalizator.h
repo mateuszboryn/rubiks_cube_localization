@@ -34,6 +34,7 @@ public:
 	bool showColorsClassifiedImage;
 	bool showSegments;
 
+	int hueShift;
 protected:
 	RKLConfig config;
 

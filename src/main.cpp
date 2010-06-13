@@ -38,6 +38,7 @@ int main(int argc, char** argv)
 		programOptions.add_options()("show-channels", po::value<bool>(&rkl.showColorChannels)->default_value(false), "show color channels");
 		programOptions.add_options()("show-colors", po::value<bool>(&rkl.showColorsClassifiedImage)->default_value(false), "show image after color classification");
 		programOptions.add_options()("show-segments", po::value<bool>(&rkl.showSegments)->default_value(false), "show segments after segments filtering");
+		programOptions.add_options()("hue-shift", po::value<int>(&rkl.hueShift)->default_value(0), "");
 
 		po::variables_map vm;
 		po::store(po::parse_command_line(argc, argv, programOptions), vm);

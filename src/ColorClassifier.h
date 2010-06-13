@@ -20,17 +20,25 @@ public:
 
 	cv::Mat& classify(const cv::Mat& image);
 
-	void setColors(const std::vector<ColorDefinition> & colors);
+	//void setColors(const std::vector<ColorDefinition> & colors);
+	void setHueShift(int shift);
 
 	bool showColorChannels;
 protected:
 	const static int maxColorClasses = 30;
 	cv::Mat thresholdedImage;
-	cv::Mat YCrCb;
-	std::vector<ColorDefinition> colors;
-	int YClasses[256], CrClasses[256], CbClasses[256];
+//	cv::Mat YCrCb;
+	cv::Mat HSV;
 
-	std::vector<cv::Mat> planesYCrCb;
+	std::vector<ColorDefinition> colors;
+//	int YClasses[256], CrClasses[256], CbClasses[256];
+
+	int HClasses[256], SClasses[256], VClasses[256];
+
+//	std::vector<cv::Mat> planesYCrCb;
+	std::vector<cv::Mat> planesHSV;
+
+	int shift;
 };
 
 #endif /* COLORCLASSIFIER_H_ */

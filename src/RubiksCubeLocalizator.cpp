@@ -32,7 +32,7 @@ RubiksCubeLocalizator::~RubiksCubeLocalizator()
 void RubiksCubeLocalizator::setConfig(const RKLConfig & config)
 {
 	this->config = config;
-	colorClassifier.setColors(config.colors);
+	//colorClassifier.setColors(config.colors);
 }
 
 bool RubiksCubeLocalizator::locateCube(const Mat& image)
@@ -44,6 +44,7 @@ bool RubiksCubeLocalizator::locateCube(const Mat& image)
 	}
 
 	colorClassifier.showColorChannels = showColorChannels;
+	colorClassifier.setHueShift(hueShift);
 	colorClassifiedImage = colorClassifier.classify(filteredImage);
 	if (showColorsClassifiedImage) {
 		showIndexedImage(colorClassifiedImage);
