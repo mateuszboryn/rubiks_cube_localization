@@ -24,18 +24,20 @@ public:
 	void setHueShift(int shift);
 
 	bool showColorChannels;
+
+	const std::vector<ColorDefinition>& getColors() const;
 protected:
 	const static int maxColorClasses = 30;
 	cv::Mat thresholdedImage;
-//	cv::Mat YCrCb;
+	//	cv::Mat YCrCb;
 	cv::Mat HSV;
 
 	std::vector<ColorDefinition> colors;
-//	int YClasses[256], CrClasses[256], CbClasses[256];
+	//	int YClasses[256], CrClasses[256], CbClasses[256];
 
 	int HClasses[256], SClasses[256], VClasses[256];
 
-//	std::vector<cv::Mat> planesYCrCb;
+	//	std::vector<cv::Mat> planesYCrCb;
 	std::vector<cv::Mat> planesHSV;
 
 	int shift;

@@ -23,36 +23,52 @@ ColorClassifier::ColorClassifier() :
 	}
 
 	// green
-	colors.push_back(ColorDefinition(0, 255, 0, 105 / 2, 135 / 2, 61, 255, 51, 255));
+	colors.push_back(ColorDefinition(0, 255, 0, 45, 75, 100, 255, 160, 255));
 
 	// blue
-	colors.push_back(ColorDefinition(0, 0, 255, 225 / 2, 255 / 2, 61, 255, 35, 255));
+	colors.push_back(ColorDefinition(0, 0, 255, 100, 140, 100, 255, 127, 255));
 
 	// yellow
-	colors.push_back(ColorDefinition(255, 255, 0, 45 / 2 + 1, 75 / 2, 61, 255, 35, 255));
+	colors.push_back(ColorDefinition(255, 255, 0, 20, 44, 100, 255, 200, 255));
 
 	// white
-	//colors.push_back(ColorDefinition(255, 255, 255, 0, 255, 0, 60, 35, 255));
+	colors.push_back(ColorDefinition(255, 255, 255, 0, 255, 0, 60, 220, 255));
 
-	// red/orange
-	colors.push_back(ColorDefinition(255, 0, 0, 345 / 2, 15 / 2, 0, 60, 35, 255));
+	// red
+	colors.push_back(ColorDefinition(255, 0, 0, 150, 7, 150, 230, 200, 255));
+
+	// orange
+	colors.push_back(ColorDefinition(255, 128, 64, 8, 19, 150, 230, 200, 255));
 
 	if (colors.size() > maxColorClasses) {
 		throw logic_error("config.colors.size() > maxColorClasses");
 	}
 
-	for (int i = 0; i < colors.size(); ++i) {
-		for (int j = colors[i].min0; j < colors[i].max0; j = (j + 1) % 256) {
-			//			YClasses[j] |= 1 << i;
-			HClasses[j] |= 1 << i;
+	vector<ColorDefinition>::const_iterator it;
+	int i = 0;
+	for (it = colors.begin(); it != colors.end(); ++it, ++i) {
+		for (int j = 0; j < 256; ++j) {
+			if ((it->min0 <= j && j <= it->max0) || (it->min0 > it->max0 && (j <= it->max0 || it->min0 <= j))) {
+				HClasses[j] |= 1 << i;
+			}
+			if ((it->min1 <= j && j <= it->max1) || (it->min1 > it->max1 && (j <= it->max1 || it->min1 <= j))) {
+				SClasses[j] |= 1 << i;
+			}
+			if ((it->min2 <= j && j <= it->max2) || (it->min2 > it->max2 && (j <= it->max2 || it->min2 <= j))) {
+				VClasses[j] |= 1 << i;
+			}
+
 		}
-		for (int j = colors[i].min1; j < colors[i].max1; j = (j + 1) % 256) {
-			//			CrClasses[j] |= 1 << i;
-			SClasses[j] |= 1 << i;
+
+		log_dbg("LUT (%d, %d, %d): ", it->r, it->g, it->b);
+		for (int j = 0; j < 256; ++j) {
+			log_dbg("%02X", (int) HClasses[j]);
 		}
-		for (int j = colors[i].min2; j < colors[i].max2; j = (j + 1) % 256) {
-			//			CbClasses[j] |= 1 << i;
-			VClasses[j] |= 1 << i;
+		for (int j = 0; j < 256; ++j) {
+			log_dbg("%02X", (int) SClasses[j]);
+		}
+		for (int j = 0; j < 256; ++j) {
+			log_dbg("%02X", (int) VClasses[j]);
 		}
 	}
 }
@@ -72,6 +88,12 @@ cv::Mat& ColorClassifier::classify(const cv::Mat& image)
 
 	//	YCrCb.create(image.size(), CV_8UC3);
 	//	cvtColor(image, YCrCb, CV_BGR2YCrCb);
+
+	if (log_dbg_enabled) {
+		for (int j = 0; j < 256; ++j) {
+			log_dbg("%3d: %08X    %08X    %08X\n", j, HClasses[j], SClasses[j], VClasses[j]);
+		}
+	}
 
 	HSV.create(image.size(), CV_8UC3);
 	cvtColor(image, HSV, CV_BGR2HSV);
@@ -114,6 +136,9 @@ cv::Mat& ColorClassifier::classify(const cv::Mat& image)
 	//		p("ColorClassifier::classify(): YCrCbIt != YCrCbEnd || thIt != thEnd\n");
 	//	}
 
+	log_dbg("ColorClassifier::ColorClassifier(): colors.size()=%d\n", colors.size());
+	log_dbg("ColorClassifier::classify(): shift = %d\n", shift);
+
 	MatIterator_<Vec<uchar, 3> > HSVIt = HSV.begin<Vec<uchar, 3> > ();
 	MatIterator_<Vec<uchar, 3> > HSVEnd = HSV.end<Vec<uchar, 3> > ();
 
@@ -137,4 +162,9 @@ cv::Mat& ColorClassifier::classify(const cv::Mat& image)
 void ColorClassifier::setHueShift(int shift)
 {
 	this->shift = shift;
+}
+
+const std::vector<ColorDefinition>& ColorClassifier::getColors() const
+{
+	return colors;
 }

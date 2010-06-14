@@ -29,11 +29,11 @@ RubiksCubeLocalizator::~RubiksCubeLocalizator()
 {
 }
 
-void RubiksCubeLocalizator::setConfig(const RKLConfig & config)
-{
-	this->config = config;
-	//colorClassifier.setColors(config.colors);
-}
+//void RubiksCubeLocalizator::setConfig(const RKLConfig & config)
+//{
+//	this->config = config;
+//	//colorClassifier.setColors(config.colors);
+//}
 
 bool RubiksCubeLocalizator::locateCube(const Mat& image)
 {
@@ -95,6 +95,8 @@ void RubiksCubeLocalizator::showIndexedImage(const cv::Mat& indexedImage)
 {
 	classifiedRgb.create(indexedImage.size(), CV_8UC3);
 
+	const vector<ColorDefinition> & colors = colorClassifier.getColors();
+
 	split(classifiedRgb, classifiedRgbPlanes);
 
 	int w = indexedImage.size().width;
@@ -105,11 +107,11 @@ void RubiksCubeLocalizator::showIndexedImage(const cv::Mat& indexedImage)
 			classifiedRgbPlanes[0].at<uchar> (y, x) = 0;
 			classifiedRgbPlanes[1].at<uchar> (y, x) = 0;
 			classifiedRgbPlanes[2].at<uchar> (y, x) = 0;
-			for (int i = 0; i < config.colors.size(); ++i) {
+			for (int i = 0; i < colors.size(); ++i) {
 				if (1 << i == colorClass) {
-					classifiedRgbPlanes[0].at<uchar> (y, x) = config.colors[i].b;
-					classifiedRgbPlanes[1].at<uchar> (y, x) = config.colors[i].g;
-					classifiedRgbPlanes[2].at<uchar> (y, x) = config.colors[i].r;
+					classifiedRgbPlanes[0].at<uchar> (y, x) = colors[i].b;
+					classifiedRgbPlanes[1].at<uchar> (y, x) = colors[i].g;
+					classifiedRgbPlanes[2].at<uchar> (y, x) = colors[i].r;
 				}
 			}
 		}

@@ -86,7 +86,7 @@ void RKPattern::findClosestSegments(const list<Segment>& segments, const Segment
 	closestSegments.push_back(centralSegment);
 
 	double minDistance = sqrt(centralSegment.getArea()) / 2;
-	double maxDistance = sqrt(centralSegment.getArea()) * 2;
+	double maxDistance = sqrt(centralSegment.getArea()) * 2.1;
 	int minArea = centralSegment.getArea() / 2;
 	int maxArea = centralSegment.getArea() * 2;
 

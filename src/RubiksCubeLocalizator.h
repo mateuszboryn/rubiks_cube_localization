@@ -28,7 +28,7 @@ public:
 
 	std::list<RKWall> walls;
 
-	void setConfig(const RKLConfig & config);
+//	void setConfig(const RKLConfig & config);
 	bool showFilteredImage;
 	bool showColorChannels;
 	bool showColorsClassifiedImage;
@@ -36,7 +36,7 @@ public:
 
 	int hueShift;
 protected:
-	RKLConfig config;
+//	RKLConfig config;
 
 	ColorClassifier colorClassifier;
 	Segmentation segmentation;

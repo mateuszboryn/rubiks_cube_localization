@@ -49,9 +49,9 @@ int main(int argc, char** argv)
 		}
 
 		// create RKL localizator
-		RKLConfig config;
-		config.readConfig(configFile);
-		rkl.setConfig(config);
+//		RKLConfig config;
+//		config.readConfig(configFile);
+//		rkl.setConfig(config);
 
 		shared_ptr<ImageSource> source;
 		bool processOnlyOneFrame = false;
