@@ -20,8 +20,6 @@ public:
 
 	cv::Mat& classify(const cv::Mat& image);
 
-	//void setColors(const std::vector<ColorDefinition> & colors);
-
 	const std::vector<ColorDefinition>& getColors() const;
 
 	bool showColorChannels;
@@ -30,15 +28,13 @@ public:
 protected:
 	const static int maxColorClasses = 30;
 	cv::Mat thresholdedImage;
-	//	cv::Mat YCrCb;
 	cv::Mat HSV;
+//	cv::Mat gray;
+//	cv::Mat grayEroded;
 
 	std::vector<ColorDefinition> colors;
-	//	int YClasses[256], CrClasses[256], CbClasses[256];
-
 	int HClasses[256], SClasses[256], VClasses[256];
 
-	//	std::vector<cv::Mat> planesYCrCb;
 	std::vector<cv::Mat> planesHSV;
 };
 

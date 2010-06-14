@@ -26,7 +26,7 @@ ColorClassifier::ColorClassifier() :
 	colors.push_back(ColorDefinition(0, 255, 0, 45, 85, 100, 255, 100, 255));
 
 	// blue
-	colors.push_back(ColorDefinition(0, 0, 255, 90, 140, 100, 255, 127, 255));
+	colors.push_back(ColorDefinition(0, 0, 255, 90, 140, 100, 255, 120, 255));
 
 	// yellow
 	colors.push_back(ColorDefinition(255, 255, 0, 20, 44, 100, 255, 200, 255));
@@ -35,7 +35,7 @@ ColorClassifier::ColorClassifier() :
 	colors.push_back(ColorDefinition(255, 255, 255, 0, 255, 0, 60, 220, 255));
 
 	// red
-	colors.push_back(ColorDefinition(255, 0, 0, 150, 7, 150, 230, 100, 255));
+	colors.push_back(ColorDefinition(255, 0, 0, 150, 7, 150, 230, 130, 255));
 
 	// orange
 	colors.push_back(ColorDefinition(255, 128, 64, 8, 19, 130, 230, 200, 255));
@@ -98,6 +98,10 @@ cv::Mat& ColorClassifier::classify(const cv::Mat& image)
 	HSV.create(image.size(), CV_8UC3);
 	cvtColor(image, HSV, CV_BGR2HSV);
 
+	//	split(HSV, planesHSV);
+	//	erode(planesHSV[2], grayEroded, Mat());
+	//	adaptiveThreshold(grayEroded, gray, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, 5, 6);
+
 	if (showColorChannels) {
 		//		split(YCrCb, planesYCrCb);
 		//		namedWindow("Y", CV_WINDOW_AUTOSIZE);
@@ -108,8 +112,6 @@ cv::Mat& ColorClassifier::classify(const cv::Mat& image)
 		//
 		//		namedWindow("Cb", CV_WINDOW_AUTOSIZE);
 		//		imshow("Cb", planesYCrCb[2]);
-
-		split(HSV, planesHSV);
 		namedWindow("H", CV_WINDOW_AUTOSIZE);
 		imshow("H", planesHSV[0]);
 
@@ -118,37 +120,36 @@ cv::Mat& ColorClassifier::classify(const cv::Mat& image)
 
 		namedWindow("V", CV_WINDOW_AUTOSIZE);
 		imshow("V", planesHSV[2]);
+
+		//namedWindow("gray", CV_WINDOW_AUTOSIZE);
+		//imshow("gray", gray);
 	}
 
 	log_dbg("ColorClassifier::ColorClassifier(): colors.size()=%d\n", colors.size());
 	log_dbg("ColorClassifier::classify(): shift = %d\n", shift);
 
-	MatConstIterator_<Vec<uchar, 3> > RGBIt = image.begin<Vec<uchar, 3> > ();
-	MatConstIterator_<Vec<uchar, 3> > RGBEnd = image.end<Vec<uchar, 3> > ();
+	//	MatIterator_<uchar> grayIt = gray.begin<uchar> ();
+	//	MatIterator_<uchar> grayEnd = gray.end<uchar> ();
 
 	MatIterator_<Vec<uchar, 3> > HSVIt = HSV.begin<Vec<uchar, 3> > ();
 	MatIterator_<Vec<uchar, 3> > HSVEnd = HSV.end<Vec<uchar, 3> > ();
 
 	MatIterator_<int> thIt = thresholdedImage.begin<int> ();
 	MatIterator_<int> thEnd = thresholdedImage.end<int> ();
-	for (; HSVIt != HSVEnd && thIt != thEnd && RGBIt != RGBEnd; ++HSVIt, ++thIt, ++RGBIt) {
-		int B = (*RGBIt)[0];
-		int G = (*RGBIt)[1];
-		int R = (*RGBIt)[2];
-		int gray = R + G + B;
-
-		if (gray < minGray) {
-			*thIt = 0;
-		} else {
-			uchar H = (*HSVIt)[0];
-			uchar S = (*HSVIt)[1];
-			uchar V = (*HSVIt)[2];
-			H = (H + shift) % 180;
-			*thIt = HClasses[H] & SClasses[S] & VClasses[V];
-		}
+	for (; HSVIt != HSVEnd && thIt != thEnd /*&& grayIt != grayEnd*/; ++HSVIt, ++thIt /*, ++grayIt*/) {
+		uchar H = (*HSVIt)[0];
+		uchar S = (*HSVIt)[1];
+		uchar V = (*HSVIt)[2];
+		H = (H + shift) % 180;
+		//if(*grayIt){
+		*thIt = HClasses[H] & SClasses[S] & VClasses[V];
+		//		}
+		//		else{
+		//			*thIt = 0;
+		//		}
 	}
 
-	if (HSVIt != HSVEnd || thIt != thEnd || RGBIt != RGBEnd) {
+	if (HSVIt != HSVEnd || thIt != thEnd /*|| grayIt != grayEnd*/) {
 		p("ColorClassifier::classify(): HSVIt != HSVEnd || thIt != thEnd\n");
 	}
 

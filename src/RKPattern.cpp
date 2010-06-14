@@ -56,7 +56,7 @@ const std::list<RKWall>& RKPattern::findCube(const list<Segment>& segments)
 	for (it = segments.begin(); it != segments.end(); ++it) {
 		findClosestSegments(segments, *it);
 
-		if (closestSegments.size() == 9 || closestSegments.size() == 8) {
+		if (closestSegments.size() >= 7 && closestSegments.size() <= 9) {
 			log("RKPattern::findCube(): closestSegments.size() == %d:\n", closestSegments.size());
 
 			vector<Segment>::const_iterator it2;
@@ -86,9 +86,9 @@ void RKPattern::findClosestSegments(const list<Segment>& segments, const Segment
 	closestSegments.push_back(centralSegment);
 
 	double minDistance = sqrt(centralSegment.getArea()) / 2;
-	double maxDistance = sqrt(centralSegment.getArea()) * 2.1;
-	int minArea = centralSegment.getArea() / 2;
-	int maxArea = centralSegment.getArea() * 2;
+	double maxDistance = sqrt(centralSegment.getArea()) * 1.9;
+	double minArea = centralSegment.getArea() * 0.7;
+	double maxArea = centralSegment.getArea() * 2;
 
 	log_dbg("centralSegment: (%d, %d), area: %d\n", centralSegment.getMassCenter().x, centralSegment.getMassCenter().y, centralSegment.getArea());
 
