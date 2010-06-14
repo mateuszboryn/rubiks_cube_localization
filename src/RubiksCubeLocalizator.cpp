@@ -20,7 +20,7 @@ using namespace std;
 using namespace cv;
 
 RubiksCubeLocalizator::RubiksCubeLocalizator() :
-	showFilteredImage(false), showColorChannels(false), showColorsClassifiedImage(false), showSegments(false)
+	showFilteredImage(false), showColorsClassifiedImage(false), showSegments(false)
 {
 	minSegmentArea = 100;
 }
@@ -43,8 +43,6 @@ bool RubiksCubeLocalizator::locateCube(const Mat& image)
 		imshow("filteredImage", filteredImage);
 	}
 
-	colorClassifier.showColorChannels = showColorChannels;
-	colorClassifier.setHueShift(hueShift);
 	colorClassifiedImage = colorClassifier.classify(filteredImage);
 	if (showColorsClassifiedImage) {
 		showIndexedImage(colorClassifiedImage);
@@ -119,4 +117,9 @@ void RubiksCubeLocalizator::showIndexedImage(const cv::Mat& indexedImage)
 
 	merge(classifiedRgbPlanes, classifiedRgb);
 	imshow("colorsClassified", classifiedRgb);
+}
+
+ColorClassifier& RubiksCubeLocalizator::getColorClassifier()
+{
+	return colorClassifier;
 }

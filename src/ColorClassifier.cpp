@@ -15,7 +15,7 @@ using namespace std;
 using namespace cv;
 
 ColorClassifier::ColorClassifier() :
-	showColorChannels(false), shift(0)
+	showColorChannels(false), shift(0), minGray(0)
 {
 	for (int i = 0; i < 256; ++i) {
 		//		YClasses[i] = CrClasses[i] = CbClasses[i] = 0;
@@ -23,10 +23,10 @@ ColorClassifier::ColorClassifier() :
 	}
 
 	// green
-	colors.push_back(ColorDefinition(0, 255, 0, 45, 75, 100, 255, 160, 255));
+	colors.push_back(ColorDefinition(0, 255, 0, 45, 85, 100, 255, 100, 255));
 
 	// blue
-	colors.push_back(ColorDefinition(0, 0, 255, 100, 140, 100, 255, 127, 255));
+	colors.push_back(ColorDefinition(0, 0, 255, 90, 140, 100, 255, 127, 255));
 
 	// yellow
 	colors.push_back(ColorDefinition(255, 255, 0, 20, 44, 100, 255, 200, 255));
@@ -35,10 +35,10 @@ ColorClassifier::ColorClassifier() :
 	colors.push_back(ColorDefinition(255, 255, 255, 0, 255, 0, 60, 220, 255));
 
 	// red
-	colors.push_back(ColorDefinition(255, 0, 0, 150, 7, 150, 230, 200, 255));
+	colors.push_back(ColorDefinition(255, 0, 0, 150, 7, 150, 230, 100, 255));
 
 	// orange
-	colors.push_back(ColorDefinition(255, 128, 64, 8, 19, 150, 230, 200, 255));
+	colors.push_back(ColorDefinition(255, 128, 64, 8, 19, 130, 230, 200, 255));
 
 	if (colors.size() > maxColorClasses) {
 		throw logic_error("config.colors.size() > maxColorClasses");
@@ -120,48 +120,39 @@ cv::Mat& ColorClassifier::classify(const cv::Mat& image)
 		imshow("V", planesHSV[2]);
 	}
 
-	//	MatIterator_<Vec<uchar, 3> > YCrCbIt = YCrCb.begin<Vec<uchar, 3> > ();
-	//	MatIterator_<Vec<uchar, 3> > YCrCbEnd = YCrCb.end<Vec<uchar, 3> > ();
-	//
-	//	MatIterator_<int> thIt = thresholdedImage.begin<int> ();
-	//	MatIterator_<int> thEnd = thresholdedImage.end<int> ();
-	//	for (; YCrCbIt != YCrCbEnd && thIt != thEnd; ++YCrCbIt, ++thIt) {
-	//		uchar Y = (*YCrCbIt)[0];
-	//		uchar Cr = (*YCrCbIt)[1];
-	//		uchar Cb = (*YCrCbIt)[2];
-	//		*thIt = YClasses[Y] & CrClasses[Cr] & CbClasses[Cb];
-	//	}
-	//
-	//	if (YCrCbIt != YCrCbEnd || thIt != thEnd) {
-	//		p("ColorClassifier::classify(): YCrCbIt != YCrCbEnd || thIt != thEnd\n");
-	//	}
-
 	log_dbg("ColorClassifier::ColorClassifier(): colors.size()=%d\n", colors.size());
 	log_dbg("ColorClassifier::classify(): shift = %d\n", shift);
+
+	MatConstIterator_<Vec<uchar, 3> > RGBIt = image.begin<Vec<uchar, 3> > ();
+	MatConstIterator_<Vec<uchar, 3> > RGBEnd = image.end<Vec<uchar, 3> > ();
 
 	MatIterator_<Vec<uchar, 3> > HSVIt = HSV.begin<Vec<uchar, 3> > ();
 	MatIterator_<Vec<uchar, 3> > HSVEnd = HSV.end<Vec<uchar, 3> > ();
 
 	MatIterator_<int> thIt = thresholdedImage.begin<int> ();
 	MatIterator_<int> thEnd = thresholdedImage.end<int> ();
-	for (; HSVIt != HSVEnd && thIt != thEnd; ++HSVIt, ++thIt) {
-		uchar H = (*HSVIt)[0];
-		uchar S = (*HSVIt)[1];
-		uchar V = (*HSVIt)[2];
-		H = (H + shift) % 180;
-		*thIt = HClasses[H] & SClasses[S] & VClasses[V];
+	for (; HSVIt != HSVEnd && thIt != thEnd && RGBIt != RGBEnd; ++HSVIt, ++thIt, ++RGBIt) {
+		int B = (*RGBIt)[0];
+		int G = (*RGBIt)[1];
+		int R = (*RGBIt)[2];
+		int gray = R + G + B;
+
+		if (gray < minGray) {
+			*thIt = 0;
+		} else {
+			uchar H = (*HSVIt)[0];
+			uchar S = (*HSVIt)[1];
+			uchar V = (*HSVIt)[2];
+			H = (H + shift) % 180;
+			*thIt = HClasses[H] & SClasses[S] & VClasses[V];
+		}
 	}
 
-	if (HSVIt != HSVEnd || thIt != thEnd) {
+	if (HSVIt != HSVEnd || thIt != thEnd || RGBIt != RGBEnd) {
 		p("ColorClassifier::classify(): HSVIt != HSVEnd || thIt != thEnd\n");
 	}
 
 	return thresholdedImage;
-}
-
-void ColorClassifier::setHueShift(int shift)
-{
-	this->shift = shift;
 }
 
 const std::vector<ColorDefinition>& ColorClassifier::getColors() const

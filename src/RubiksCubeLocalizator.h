@@ -30,11 +30,10 @@ public:
 
 //	void setConfig(const RKLConfig & config);
 	bool showFilteredImage;
-	bool showColorChannels;
 	bool showColorsClassifiedImage;
 	bool showSegments;
 
-	int hueShift;
+	ColorClassifier& getColorClassifier();
 protected:
 //	RKLConfig config;
 
@@ -45,7 +44,6 @@ protected:
 
 	cv::Mat filteredImage;
 	cv::Mat colorClassifiedImage;
-	//cv::Mat colorClassifiedImageRGB;
 	RKPattern pattern;
 	SizeFilter sizeFilter;
 	ShapeFilter shapeFilter;
